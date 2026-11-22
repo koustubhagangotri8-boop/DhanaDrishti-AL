@@ -117,3 +117,7 @@ DhanaDrishti-AI/
 DhanaDrishti AI – Smarter Financial Management Through Technology
 
 Developed for Arthaton Hackathon 2026.
+
+## DEMO Video
+Watch the DhanaDrishti AI project demonstration:
+https://youtu.be/0CE5LYzGnio?si=dkIy1kQzQkY-CrhM
