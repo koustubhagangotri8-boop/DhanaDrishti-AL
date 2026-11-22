@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>DhanaDrishti AI - Smart Finance Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 25px;
+    background: #101426;
+    color: #f1f5f9;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    text-align: center;
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+h1 {
+    color: #a78bfa;
+    font-size: 34px;
+    margin-bottom: 8px;
+}
+
+header p {
+    color: #cbd5e1;
+}
+
+h2 {
+    color: #c4b5fd;
+    margin-top: 0;
+}
+
+h3 {
+    color: #a78bfa;
+}
+
+.dashboard {
+    max-width: 1100px;
+    margin: auto;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.summary-card {
+    background: #1c2340;
+    padding: 24px;
+    border-radius: 14px;
+    border: 1px solid #343c60;
+}
+
+.summary-card h3 {
+    margin-top: 0;
+}
+
+.summary-card p {
+    font-size: 25px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.section {
+    background: #1c2340;
+    padding: 25px;
+    margin: 22px 0;
+    border-radius: 16px;
+    border: 1px solid #343c60;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+
+label {
+    display: block;
+    margin: 13px 0 7px;
+    color: #ddd6fe;
+}
+
+input, select {
+    width: 100%;
+    max-width: 450px;
+    padding: 12px;
+    border: 1px solid #6366f1;
+    border-radius: 8px;
+    background: #101426;
+    color: white;
+    margin-bottom: 12px;
+}
+
+button {
+    background: #7c3aed;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 8px 5px 8px 0;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #6d28d9;
+}
+
+.delete-btn {
+    background: #dc2626;
+}
+
+.edit-btn {
+    background: #2563eb;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 12px;
+    border-bottom: 1px solid #414968;
+    text-align: left;
+}
+
+th {
+    color: #c4b5fd;
+}
+
+.result {
+    background: #101426;
+    border: 1px solid #414968;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px;
+    line-height: 1.8;
+}
+
+canvas {
+    max-width: 450px;
+    max-height: 350px;
+    margin: 20px auto;
+}
+
+progress {
+    width: 100%;
+    height: 18px;
+    accent-color: #8b5cf6;
+}
+
+small {
+    color: #cbd5e1;
+}
+
+@media(max-width: 600px) {
+    body {
+        padding: 12px;
+    }
+
+    .section {
+        padding: 16px;
+    }
+
+    table {
+        font-size: 12px;
+    }
+
+    th, td {
+        padding: 7px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>💰 DhanaDrishti AI</h1>
+    <p>Smart Financial Management and Cash Flow Dashboard</p>
+</header>
+
+<div class="dashboard">
+
+    <!-- FINANCIAL SUMMARY -->
+    <div class="summary">
+
+        <div class="summary-card">
+            <h3>Total Income</h3>
+            <p id="income">₹20,000</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Total Expenses</h3>
+            <p id="expense">₹0</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Remaining Balance</h3>
+            <p id="balance">₹20,000</p>
+        </div>
+
+    </div>
+
+    <!-- ADD TRANSACTION -->
+    <div class="section">
+
+        <h2>➕ Add Transaction</h2>
+
+        <form id="transactionForm">
+
+            <label>Transaction ID</label>
+            <input type="number" id="id" placeholder="Enter transaction ID" required>
+
+            <label>Description</label>
+            <input type="text" id="description" placeholder="Example: Groceries" required>
+
+            <label>Category</label>
+            <select id="category" required>
+                <option value="">Select Category</option>
+                <option>Business</option>
+                <option>Food</option>
+                <option>Household</option>
+                <option>Utilities</option>
+                <option>Purchases</option>
+                <option>Transport</option>
+                <option>Education</option>
+                <option>Healthcare</option>
+                <option>Salary</option>
+                <option>Other</option>
+            </select>
+
+            <label>Amount (₹)</label>
+            <input type="number" id="amount" min="0.01" step="0.01" placeholder="Enter amount" required>
+
+            <label>Transaction Type</label>
+            <select id="type" required>
+                <option value="">Select Type</option>
+                <option value="Income">Income</option>
+                <option value="Expense">Expense</option>
+            </select>
+
+            <button type="submit">Add Transaction</button>
+
+        </form>
+
+    </div>
+
+    <!-- TRANSACTION HISTORY -->
+    <div class="section">
+
+        <h2>📋 Transaction History</h2>
+
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Type</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="transactionList"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- CATEGORY ANALYSIS -->
+    <div class="section">
+
+        <h2>📊 Expense Category Analysis</h2>
+        <div id="categoryAnalysis" class="result">
+            No expenses recorded yet.
+        </div>
+
+    </div>
+
+    <!-- PIE CHART -->
+    <div class="section">
+
+        <h2>🥧 Expense Breakdown</h2>
+        <canvas id="expenseChart"></canvas>
+
+    </div>
+
+    <!-- CASH FLOW PREDICTION -->
+    <div class="section">
+
+        <h2>🔮 Cash Flow Prediction</h2>
+
+        <label>Number of days to predict</label>
+        <input type="number" id="predictionDays" min="1" placeholder="Enter number of days">
+
+        <button onclick="predictCashFlow()">Predict Cash Flow</button>
+
+        <div id="predictionResult" class="result">
+            Enter the number of days to see a prediction.
+        </div>
+
+    </div>
+
+    <!-- SMART EXPENSE DETECTION -->
+    <div class="section">
+
+        <h2>🚨 Smart Expense Detection</h2>
+
+        <label>Set expense alert limit (₹)</label>
+        <input type="number" id="expenseLimit" min="0" placeholder="Enter alert limit">
+
+        <button onclick="detectHighExpenses()">Detect High Expenses</button>
+
+        <div id="expenseAlerts" class="result">
+            Set a limit to check your expenses.
+        </div>
+
+    </div>
+
+    <!-- FINANCIAL INSIGHTS -->
+    <div class="section">
+
+        <h2>💡 Financial Insights</h2>
+
+        <button onclick="generateInsights()">Generate Financial Insights</button>
+
+        <div id="financialInsights" class="result">
+            Click the button to generate financial insights.
+        </div>
+
+    </div>
+
+    <!-- MONTHLY BUDGET -->
+    <div class="section">
+
+        <h2>📅 Monthly Budget Management</h2>
+
+        <label>Enter your monthly budget (₹)</label>
+        <input type="number" id="monthlyBudget" min="0" placeholder="Enter monthly budget">
+
+        <button onclick="checkBudget()">Check Budget</button>
+
+        <div id="budgetResult" class="result">
+            Enter your budget to check your spending.
+        </div>
+
+    </div>
+
+    <!-- SAVINGS GOAL -->
+    <div class="section">
+
+        <h2>🎯 Savings Goal Tracker</h2>
+
+        <label>Enter your savings goal (₹)</label>
+        <input type="number" id="savingsGoal" min="0" placeholder="Enter savings goal">
+
+        <label>Current savings (₹)</label>
+        <input type="number" id="currentSavings" min="0" placeholder="Enter current savings">
+
+        <button onclick="trackSavings()">Track Savings</button>
+
+        <div id="savingsResult" class="result">
+            Enter your savings goal and current savings.
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+// LOAD SAVED DATA
+let transactions = JSON.parse(
+    localStorage.getItem("transactions") || "[]"
+);
+
+let totalIncome = Number(
+    localStorage.getItem("totalIncome") || 20000
+);
+
+let totalExpense = Number(
+    localStorage.getItem("totalExpense") ||
+    transactions
+        .filter(t => t.type === "Expense")
+        .reduce((sum, t) => sum + Number(t.amount), 0)
+);
+
+let expenseChart = null;
+
+
+// SAVE DATA
+function saveData() {
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    localStorage.setItem("totalIncome", totalIncome);
+    localStorage.setItem("totalExpense", totalExpense);
+}
+
+
+// FORMAT MONEY
+function formatMoney(amount) {
+    return "₹" + Number(amount).toLocaleString("en-IN", {
+        maximumFractionDigits: 2
+    });
+}
+
+
+// UPDATE DASHBOARD
+function updateDashboard() {
+
+    document.getElementById("income").innerText =
+        formatMoney(totalIncome);
+
+    document.getElementById("expense").innerText =
+        formatMoney(totalExpense);
+
+    document.getElementById("balance").innerText =
+        formatMoney(totalIncome - totalExpense);
+
+    updateCategoryAnalysis();
+    updateExpenseChart();
+    displayTransactions();
+    saveData();
+}
+
+
+// ADD TRANSACTION
+document.getElementById("transactionForm").addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    let id = document.getElementById("id").value;
+    let description = document.getElementById("description").value.trim();
+    let category = document.getElementById("category").value;
+    let amount = Number(document.getElementById("amount").value);
+    let type = document.getElementById("type").value;
+
+    if (!description || !category || !type || amount <= 0) {
+        alert("Please enter valid transaction details.");
+        return;
+    }
+
+    if (transactions.some(t => String(t.id) === String(id))) {
+        alert("This transaction ID already exists.");
+        return;
+    }
+
+    let transaction = {
+        id: id,
+        description: description,
+        category: category,
+        amount: amount,
+        type: type
+    };
+
+    transactions.push(transaction);
+
+    if (type === "Income") {
+        totalIncome += amount;
+    } else {
+        totalExpense += amount;
+    }
+
+    updateDashboard();
+
+    document.getElementById("transactionForm").reset();
+
+    alert("Transaction added successfully!");
+});
+
+
+// DISPLAY TRANSACTIONS
+function displayTransactions() {
+
+    let list = document.getElementById("transactionList");
+
+    list.innerHTML = "";
+
+    transactions.forEach((t, index) => {
+
+        let row = document.createElement("tr");
+
+        [
+            t.id,
+            t.description,
+            t.category,
+            formatMoney(t.amount),
+            t.type
+        ].forEach(value => {
+            let cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+        });
+
+        let actions = document.createElement("td");
+
+        let editButton = document.createElement("button");
+        editButton.textContent = "Edit";
+        editButton.className = "edit-btn";
+        editButton.onclick = () => editTransaction(index);
+
+        let deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete";
+        deleteButton.className = "delete-btn";
+        deleteButton.onclick = () => deleteTransaction(index);
+
+        actions.appendChild(editButton);
+        actions.appendChild(deleteButton);
+
+        row.appendChild(actions);
+        list.appendChild(row);
+    });
+}
+
+
+// DELETE TRANSACTION
+function deleteTransaction(index) {
+
+    if (!confirm("Are you sure you want to delete this transaction?")) {
+        return;
+    }
+
+    let t = transactions[index];
+
+    if (t.type === "Income") {
+        totalIncome -= Number(t.amount);
+    } else {
+        totalExpense -= Number(t.amount);
+    }
+
+    transactions.splice(index, 1);
+
+    updateDashboard();
+}
+
+
+// EDIT TRANSACTION
+function editTransaction(index) {
+
+    let t = transactions[index];
+
+    let description = prompt("Enter new description:", t.description);
+    if (description === null) return;
+
+    let category = prompt("Enter new category:", t.category);
+    if (category === null) return;
+
+    let amount = prompt("Enter new amount:", t.amount);
+    if (amount === null) return;
+
+    let type = prompt("Enter Income or Expense:", t.type);
+    if (type === null) return;
+
+    amount = Number(amount);
+    type = type.trim().toLowerCase();
+
+    if (!description.trim() || !category.trim() || amount <= 0 ||
+        !["income", "expense"].includes(type)) {
+        alert("Invalid details. Please try again.");
+        return;
+    }
+
+    if (t.type === "Income") {
+        totalIncome -= Number(t.amount);
+    } else {
+        totalExpense -= Number(t.amount);
+    }
+
+    t.description = description.trim();
+    t.category = category.trim();
+    t.amount = amount;
+    t.type = type === "income" ? "Income" : "Expense";
+
+    if (t.type === "Income") {
+        totalIncome += amount;
+    } else {
+        totalExpense += amount;
+    }
+
+    updateDashboard();
+
+    alert("Transaction updated successfully!");
+}
+
+
+// CATEGORY ANALYSIS
+function updateCategoryAnalysis() {
+
+    let categories = {};
+
+    transactions.forEach(t => {
+
+        if (t.type === "Expense") {
+
+            categories[t.category] =
+                (categories[t.category] || 0) + Number(t.amount);
+        }
+    });
+
+    let output = document.getElementById("categoryAnalysis");
+
+    if (Object.keys(categories).length === 0) {
+        output.innerHTML = "No expenses recorded yet.";
+        return;
+    }
+
+    output.innerHTML = "";
+
+    for (let category in categories) {
+
+        let p = document.createElement("p");
+        p.textContent = category + ": " + formatMoney(categories[category]);
+
+        output.appendChild(p);
+    }
+}
+
+
+// EXPENSE PIE CHART
+function updateExpenseChart() {
+
+    let categories = {};
+
+    transactions.forEach(t => {
+
+        if (t.type === "Expense") {
+
+            categories[t.category] =
+                (categories[t.category] || 0) + Number(t.amount);
+        }
+    });
+
+    let canvas = document.getElementById("expenseChart");
+
+    if (expenseChart) {
+        expenseChart.destroy();
+    }
+
+    if (typeof Chart === "undefined") {
+        return;
+    }
+
+    expenseChart = new Chart(canvas, {
+
+        type: "pie",
+
+        data: {
+            labels: Object.keys(categories),
+
+            datasets: [{
+                data: Object.values(categories),
+                backgroundColor: [
+                    "#8b5cf6",
+                    "#06b6d4",
+                    "#f59e0b",
+                    "#ec4899",
+                    "#22c55e",
+                    "#ef4444",
+                    "#3b82f6"
+                ],
+                borderWidth: 2,
+                borderColor: "#1c2340"
+            }]
+        },
+
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "#ffffff"
+                    }
+                }
+            }
+        }
+    });
+}
+
+
+// CASH FLOW PREDICTION
+async function predictCashFlow() {
+
+    let days = Number(
+        document.getElementById("predictionDays").value
+    );
+
+    let result = document.getElementById("predictionResult");
+
+    if (!Number.isInteger(days) || days <= 0 || days > 365) {
+        result.innerHTML = "Please enter a number between 1 and 365.";
+        return;
+    }
+
+    try {
+
+        const response = await fetch("http://127.0.0.1:5000/ml-predict", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                days: days
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Prediction failed");
+        }
+
+        let totalPredictedExpenses = 0;
+
+        let predictionHTML = "";
+
+        data.predictions.forEach(item => {
+
+            totalPredictedExpenses += item.predicted_expense;
+
+            predictionHTML += `
+                Day ${item.day}: ₹${item.predicted_expense.toFixed(2)}<br>
+            `;
+        });
+
+        result.innerHTML = `
+            <h3>AI Cash Flow Prediction</h3>
+            ${predictionHTML}
+            <hr>
+            <b>Total Predicted Expenses: ₹${totalPredictedExpenses.toFixed(2)}</b>
+            <br>
+            <small>Prediction generated using the trained sample ML model.</small>
+        `;
+
+    } catch (error) {
+
+        result.innerHTML = "Unable to connect to Python ML backend.";
+        console.error(error);
+    }
+}
+// SMART EXPENSE DETECTION
+function detectHighExpenses() {
+
+    let limit = Number(
+        document.getElementById("expenseLimit").value
+    );
+
+    let result = document.getElementById("expenseAlerts");
+
+    if (document.getElementById("expenseLimit").value === "" || limit < 0) {
+        result.innerHTML = "Please enter a valid expense limit.";
+        return;
+    }
+
+    let highExpenses = transactions.filter(t =>
+        t.type === "Expense" && Number(t.amount) > limit
+    );
+
+    if (highExpenses.length === 0) {
+        result.innerHTML = "No unusually high expenses found!";
+        return;
+    }
+
+    result.innerHTML = "<strong>High Expenses Detected:</strong>";
+
+    highExpenses.forEach(t => {
+
+        let p = document.createElement("p");
+
+        p.textContent =
+            t.description + " - " + formatMoney(t.amount);
+
+        result.appendChild(p);
+    });
+}
+
+
+// FINANCIAL INSIGHTS
+function generateInsights() {
+
+    let result = document.getElementById("financialInsights");
+
+    let categories = {};
+
+    transactions.forEach(t => {
+
+        if (t.type === "Expense") {
+
+            categories[t.category] =
+                (categories[t.category] || 0) + Number(t.amount);
+        }
+    });
+
+    let highestCategory = "None";
+    let highestAmount = 0;
+
+    for (let category in categories) {
+
+        if (categories[category] > highestAmount) {
+            highestAmount = categories[category];
+            highestCategory = category;
+        }
+    }
+
+    let message = `
+        Total Recorded Expenses: ${formatMoney(totalExpense)}<br>
+        Highest Spending Category: ${highestCategory}<br>
+    `;
+
+    if (highestCategory !== "None") {
+        message +=
+            "Try setting a budget for " + highestCategory +
+            " to manage your spending.<br>";
+    }
+
+    if (totalIncome > totalExpense) {
+        message += "Good job! Your recorded income is higher than your expenses.";
+    } else if (totalExpense > totalIncome) {
+        message += "Warning! Your expenses are higher than your income.";
+    } else {
+        message += "Your recorded income and expenses are equal.";
+    }
+
+    result.innerHTML = message;
+}
+
+
+// MONTHLY BUDGET
+function checkBudget() {
+
+    let budgetInput = document.getElementById("monthlyBudget").value;
+    let budget = Number(budgetInput);
+
+    let result = document.getElementById("budgetResult");
+
+    if (budgetInput === "" || budget <= 0) {
+        result.innerHTML = "Please enter a valid monthly budget.";
+        return;
+    }
+
+    let remaining = budget - totalExpense;
+
+    if (remaining >= 0) {
+
+        result.innerHTML = `
+            Total Expenses: ${formatMoney(totalExpense)}<br>
+            Remaining Budget: ${formatMoney(remaining)}<br>
+            Good job! You are within your budget.
+        `;
+
+    } else {
+
+        result.innerHTML = `
+            Total Expenses: ${formatMoney(totalExpense)}<br>
+            Budget Exceeded By: ${formatMoney(Math.abs(remaining))}<br>
+            Warning! You have exceeded your budget.
+        `;
+    }
+}
+
+
+// SAVINGS GOAL TRACKER
+function trackSavings() {
+
+    let goalInput = document.getElementById("savingsGoal").value;
+    let savingsInput = document.getElementById("currentSavings").value;
+
+    let goal = Number(goalInput);
+    let savings = Number(savingsInput);
+
+    let result = document.getElementById("savingsResult");
+
+    if (goalInput === "" || savingsInput === "" ||
+        goal <= 0 || savings < 0) {
+        result.innerHTML = "Please enter valid savings details.";
+        return;
+    }
+
+    let remaining = goal - savings;
+
+    let percentage = (savings / goal) * 100;
+
+    result.innerHTML = `
+        Savings Goal: ${formatMoney(goal)}<br>
+        Current Savings: ${formatMoney(savings)}<br>
+        Remaining Amount: ${formatMoney(Math.max(0, remaining))}<br>
+        Progress: ${Math.min(100, percentage).toFixed(1)}%<br>
+        <progress value="${Math.min(100, percentage)}" max="100"></progress><br>
+        ${remaining <= 0
+            ? "Congratulations! You have reached your savings goal!"
+            : "Keep saving! You're making progress."}
+    `;
+}
+
+
+// INITIAL DASHBOARD DISPLAY
+updateDashboard();
+async function testBackendConnection() {
+
+    try {
+
+        const response = await fetch("http://127.0.0.1:5000/");
+
+        const data = await response.json();
+
+        alert(data.message);
+
+    } catch (error) {
+
+        alert("Backend connection failed!");
+        console.error(error);
+
+    }
+}
+
+</script>
+<button onclick="testBackendConnection()">
+    Test Python Backend
+</button>
+
+</body>
+</html>

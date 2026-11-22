@@ -1,0 +1,6 @@
+*.exe
+transaction_backup.c
+__pycache__/
+*.pyc
+.venv/
+venv/

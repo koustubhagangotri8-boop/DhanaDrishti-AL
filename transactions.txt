@@ -1,0 +1,6 @@
+101 Sales Business 20000.00 Income
+102 Rent Utilities 4000.00 Expense
+103 Stock Purchases 5000.00 Expense
+104 Electricity Utilities 3000.00 Expense
+201 Sales Business 20000.00 Income
+202 Rent Utilities 4000.00 Expense
